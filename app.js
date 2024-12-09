@@ -1,4 +1,5 @@
 const express = require("express");
+const connectDB = require("./database");
 const app = express();
 const port = 8000;
 
@@ -9,6 +10,8 @@ const recipesRouter = require("./apis/recipes/routes");
 app.use("/api/categories", categoriesrouter);
 app.use("/api/ingredients", ingredientsRouter);
 app.use("/api/recipes", recipesRouter);
+
+connectDB();
 
 app.listen(port, () => {
   console.log(`Server running at ${port}`);
