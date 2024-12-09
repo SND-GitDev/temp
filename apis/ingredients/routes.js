@@ -1,9 +1,9 @@
 const express = require("express");
+const { listIngredient, createIngredient } = require("./controllers");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.json("ingredients!");
-});
+router.get("/", listIngredient);
+router.post("/", createIngredient);
 
 module.exports = router;
