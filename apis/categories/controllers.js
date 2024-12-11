@@ -18,3 +18,12 @@ exports.updateCategory = async (req, res) => {
   console.log("updatedCategory", updatedCategory);
   res.status(200).json(updatedCategory);
 };
+
+exports.addRecipe = async (req, res) => {
+  const { categoryId, recipeId } = req.params;
+  const category = await Category.findById(categoryId);
+  const updatedCategory = await category.updateOne({
+    $push: { recipes: recipeId },
+  });
+  res.status(200).json(updatedCategory);
+};
