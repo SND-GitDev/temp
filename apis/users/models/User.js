@@ -1,9 +1,11 @@
 const { model, Schema } = require("mongoose");
 
 const UserSchema = new Schema({
-  name: { type: String },
+  name: {
+    type: String,
+    unique: true,
+  },
   password: { type: String },
-  session: { type: String },
   myRecipes: [
     {
       type: Schema.Types.ObjectId,

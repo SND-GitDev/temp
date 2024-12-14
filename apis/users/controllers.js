@@ -1,19 +1,25 @@
 const bcrypt = require("bcrypt");
 const User = require("./models/User");
-const uuid = require("uuid");
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET, JWT_EXPIRATION_MS } = require("../../key");
 
 exports.registerUser = async (req, res) => {
   const saltRounds = 10;
   req.body.password = await bcrypt.hash(req.body.password, saltRounds);
 
-  const users = await User.find({ name: `${req.body.name}` });
-  if (users.length > 0) {
-    res.status(400).json({ error: "Name Already Taken..." });
-  } else {
+  try {
     const user = User(req.body);
-    user.session = uuid.v4();
-    const registeredUser = await user.save();
-    res.status(201).json({ token: registeredUser.session });
+    await user.save();
+    const payload = {
+      id: user.id,
+      name: user.username,
+      exp: Date.now() + JWT_EXPIRATION_MS,
+    };
+    const token = jwt.sign(JSON.stringify(payload), JWT_SECRET);
+    res.status(201).json({ token: token });
+  } catch (e) {
+    console.log(e.message);
+    res.status(400).json(e.message);
   }
 };
 
@@ -25,4 +31,15 @@ exports.logoutUser = async (req, res) => {
     await user.save();
   }
   res.status(200).json();
+};
+
+exports.loginUser = async (req, res) => {
+  const { user } = req;
+  const payload = {
+    id: user.id,
+    username: user.name,
+    exp: Date.now() + parseInt(JWT_EXPIRATION_MS),
+  };
+  const token = jwt.sign(JSON.stringify(payload), JWT_SECRET);
+  res.json({ token });
 };
